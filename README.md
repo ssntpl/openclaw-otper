@@ -19,9 +19,9 @@ openclaw plugins install npm:@ssntpl/openclaw-otper
 
 ## Configure
 
-Two ways — either works, plugin config takes precedence:
+Generate a personal access token at **https://otper.com/settings/tokens**, then provide it via any one of these (resolved in order):
 
-**1. Plugin config** (preferred):
+**1. Plugin config**:
 
 ```json
 {
@@ -34,14 +34,21 @@ Two ways — either works, plugin config takes precedence:
 }
 ```
 
-**2. Environment variables** (handy for CI / one-off runs):
+**2. Environment variables**:
 
 ```sh
 export OTPER_TOKEN="238|..."
 export OTPER_BASE_URL="https://otper.com"   # optional, defaults to https://otper.com
 ```
 
-Generate a token from your Otper account settings.
+**3. Reuse [`otper-cli`](https://github.com/ssntpl/otper-cli)'s saved login**:
+
+```sh
+npm install -g @ssntpl/otper-cli
+otper auth:login            # writes ~/.otper-cli/default/config.json
+```
+
+If you already use `otper-cli`, no extra setup is needed — the plugin reads the same config file.
 
 ## Tools
 

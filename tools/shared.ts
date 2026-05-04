@@ -1,4 +1,4 @@
-import { OtperClient, DEFAULT_BASE_URL } from "@ssntpl/otper-cli";
+import { OtperClient, resolveConfig } from "@ssntpl/otper-cli";
 
 export interface PluginConfig {
   token?: string;
@@ -6,19 +6,31 @@ export interface PluginConfig {
 }
 
 /**
- * Build an OtperClient from the openclaw plugin config, falling back to
- * the same env vars the otper-cli uses (OTPER_TOKEN, OTPER_BASE_URL).
- * Throws a clear, agent-readable error if no token can be resolved.
+ * Build an OtperClient using otper-cli's standard resolution chain:
+ *   1. Plugin config (token / baseUrl from openclaw plugin settings)
+ *   2. Environment vars (OTPER_TOKEN / OTPER_BASE_URL)
+ *   3. otper-cli's saved credentials at ~/.otper-cli/<profile>/config.json
+ *      (created by `otper auth:login`)
+ *
+ * Sharing the resolution with otper-cli means a single login serves
+ * both the CLI and this plugin.
  */
 export function clientFor(config: PluginConfig | undefined): OtperClient {
-  const token = config?.token ?? process.env.OTPER_TOKEN;
-  const baseUrl = config?.baseUrl ?? process.env.OTPER_BASE_URL ?? DEFAULT_BASE_URL;
-  if (!token) {
+  try {
+    const cfg = resolveConfig({
+      token: config?.token,
+      baseUrl: config?.baseUrl,
+    });
+    return OtperClient.fromConfig(cfg);
+  } catch {
     throw new Error(
-      "Otper is not configured. Set the plugin's `token` config or the OTPER_TOKEN environment variable.",
+      "Otper is not configured. Provide a token via the openclaw plugin " +
+        "config, the OTPER_TOKEN environment variable, or by running " +
+        "`otper auth:login` to save credentials at " +
+        "~/.otper-cli/<profile>/config.json. Generate a personal access " +
+        "token at https://otper.com/settings/tokens.",
     );
   }
-  return new OtperClient({ baseUrl, token });
 }
 
 export type TextContent = { type: "text"; text: string };
