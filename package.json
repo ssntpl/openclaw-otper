@@ -1,6 +1,6 @@
 {
   "name": "@ssntpl/openclaw-otper",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "OpenClaw plugin for Otper boards (https://otper.com) — exposes Otper boards, lists, cards, labels, comments, and today's priorities as agent tools.",
   "author": "SSNTPL <info@ssntpl.com>",
   "license": "MIT",
@@ -39,7 +39,7 @@
     ]
   },
   "dependencies": {
-    "@ssntpl/otper-cli": "^0.1.5"
+    "@ssntpl/otper-cli": "^0.1.7"
   },
   "devDependencies": {
     "@types/node": "^20.16.10",

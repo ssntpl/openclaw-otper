@@ -1,4 +1,4 @@
-import { OtperClient, resolveConfig } from "@ssntpl/otper-cli";
+import { OtperClient, resolveConfig, toOtperDateTime } from "@ssntpl/otper-cli";
 
 export interface PluginConfig {
   token?: string;
@@ -52,7 +52,11 @@ export function fmtDate(iso: string | null | undefined): string {
   return iso.replace("T", " ").replace(/\.\d+Z?$/, "").replace(/Z$/, " UTC");
 }
 
-/** Today's date as YYYY-MM-DD HH:MM:SS, used as default `assigned_at`. */
+/**
+ * Otper-formatted "now" (YYYY-MM-DD HH:MM:SS UTC). Otper rejects ISO-8601
+ * strings with milliseconds; this helper matches what its DateTime scalar
+ * accepts.
+ */
 export function nowIso(): string {
-  return new Date().toISOString();
+  return toOtperDateTime();
 }
