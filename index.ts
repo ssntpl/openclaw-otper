@@ -11,6 +11,7 @@
 import { boardTools } from "./tools/boards.ts";
 import { cardTools } from "./tools/cards.ts";
 import { commentTools } from "./tools/comments.ts";
+import { fileTools } from "./tools/files.ts";
 import { labelTools } from "./tools/labels.ts";
 import { listTools } from "./tools/lists.ts";
 import { meTools } from "./tools/me.ts";
@@ -32,6 +33,7 @@ const otperPlugin = {
       ...listTools(config),
       ...cardTools(config),
       ...commentTools(config),
+      ...fileTools(config),
       ...labelTools(config),
       ...teamTools(config),
       ...priorityTools(config),
