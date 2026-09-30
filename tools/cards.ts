@@ -1,7 +1,7 @@
 import { cards, lists } from "@ssntpl/otper-cli";
 
 type UpdateCardInput = Parameters<typeof cards.updateCard>[1];
-import { clientFor, json, nowIso, PluginConfig, text } from "./shared.ts";
+import { clientFor, json, PluginConfig, text } from "./shared.ts";
 
 export function cardTools(config: PluginConfig) {
   return [
@@ -187,19 +187,22 @@ export function cardTools(config: PluginConfig) {
             description: "Set true to unarchive instead of archive.",
             default: false,
           },
+          reason: {
+            type: "string",
+            description: "Optional close reason, recorded when archiving.",
+          },
         },
         required: ["cardId"],
       },
       execute: async (
         _id: string,
-        p: { cardId: string; unarchive?: boolean },
+        p: { cardId: string; unarchive?: boolean; reason?: string },
       ) => {
         const client = clientFor(config);
         return json(
-          await cards.updateCard(client, {
-            id: p.cardId,
-            archived_at: p.unarchive ? null : nowIso(),
-          }),
+          p.unarchive
+            ? await cards.reopenCard(client, p.cardId)
+            : await cards.closeCard(client, p.cardId, p.reason),
         );
       },
     },
@@ -224,13 +227,10 @@ export function cardTools(config: PluginConfig) {
         p: { cardId: string; userIds: string[] },
       ) => {
         const client = clientFor(config);
-        const at = nowIso();
-        return json(
-          await cards.updateCard(client, {
-            id: p.cardId,
-            users: { connect: p.userIds.map((id) => ({ id, assigned_at: at })) },
-          }),
-        );
+        // The API takes one user per call; the last response carries the final assignee list.
+        let card;
+        for (const userId of p.userIds) card = await cards.assignCardMember(client, p.cardId, userId);
+        return json(card);
       },
     },
     {
@@ -250,12 +250,9 @@ export function cardTools(config: PluginConfig) {
         p: { cardId: string; userIds: string[] },
       ) => {
         const client = clientFor(config);
-        return json(
-          await cards.updateCard(client, {
-            id: p.cardId,
-            users: { disconnect: p.userIds },
-          }),
-        );
+        let card;
+        for (const userId of p.userIds) card = await cards.unassignCardMember(client, p.cardId, userId);
+        return json(card);
       },
     },
     {

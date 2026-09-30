@@ -39,7 +39,7 @@
     ]
   },
   "dependencies": {
-    "@ssntpl/otper-cli": "^0.1.9"
+    "@ssntpl/otper-cli": "^0.1.10"
   },
   "devDependencies": {
     "@types/node": "^20.16.10",
